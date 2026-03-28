@@ -17,8 +17,8 @@ ALLOWED_CHAT_ID = int(os.getenv("ALLOWED_CHAT_ID", -1001234567890))
 ADMIN_CHAT_ID = int(os.getenv("ADMIN_CHAT_ID", 0))
 OWNER_ID = int(os.getenv("OWNER_ID", 0))
 
-# Цены подписок (в USD)
-PRICES = {
+# Цены подписок (в долларах США)
+SUBSCRIPTION_PRICES = {
     "admin": {
         "1_week": 33,
         "2_weeks": 40,
@@ -36,7 +36,26 @@ PRICES = {
     }
 }
 
-# ID кастомных эмодзи (премиум) для кнопок и сообщений
+# Длительность в днях для каждого типа и срока
+DURATIONS = {
+    "admin": {
+        "1_week": 7,
+        "2_weeks": 14,
+        "1_month": 30
+    },
+    "broadcast": {
+        "1_week": 7,
+        "2_weeks": 14,
+        "1_month": 30
+    },
+    "prefix": {
+        "1_month": 30,
+        "3_months": 90,
+        "6_months": 180
+    }
+}
+
+# ID кастомных премиум-эмодзи (вставьте свои)
 CUSTOM_EMOJI_IDS = {
     "stats": "5197313098523889805",
     "broadcast": "5215346626817713558",
@@ -62,21 +81,7 @@ CUSTOM_EMOJI_IDS = {
     "buy_ad": "5409048419211682843",
 }
 
-# HTML-теги для кастомных эмодзи в тексте (только для сообщений)
+# HTML-теги для текстовых сообщений
 CUSTOM_EMOJIS = {
-    "stats": f'<tg-emoji emoji-id="{CUSTOM_EMOJI_IDS["stats"]}">📊</tg-emoji>',
-    "broadcast": f'<tg-emoji emoji-id="{CUSTOM_EMOJI_IDS["broadcast"]}">📢</tg-emoji>',
-    "admin": f'<tg-emoji emoji-id="{CUSTOM_EMOJI_IDS["admin"]}">🔧</tg-emoji>',
-    "logs": f'<tg-emoji emoji-id="{CUSTOM_EMOJI_IDS["logs"]}">📜</tg-emoji>',
-    "back": f'<tg-emoji emoji-id="{CUSTOM_EMOJI_IDS["back"]}">◀</tg-emoji>',
-    "close": f'<tg-emoji emoji-id="{CUSTOM_EMOJI_IDS["close"]}">❌</tg-emoji>',
-    "success": f'<tg-emoji emoji-id="{CUSTOM_EMOJI_IDS["success"]}">✅</tg-emoji>',
-    "error": f'<tg-emoji emoji-id="{CUSTOM_EMOJI_IDS["error"]}">❌</tg-emoji>',
-    "wait": f'<tg-emoji emoji-id="{CUSTOM_EMOJI_IDS["wait"]}">⏳</tg-emoji>',
-    "user": f'<tg-emoji emoji-id="{CUSTOM_EMOJI_IDS["user"]}">👤</tg-emoji>',
-    "subscription": f'<tg-emoji emoji-id="{CUSTOM_EMOJI_IDS["my_subs"]}">💰</tg-emoji>',
-    "greeting": f'<tg-emoji emoji-id="{CUSTOM_EMOJI_IDS["greeting"]}">👋</tg-emoji>',
-    "pinned": f'<tg-emoji emoji-id="{CUSTOM_EMOJI_IDS["pinned"]}">📌</tg-emoji>',
-    "admin_panel": f'<tg-emoji emoji-id="{CUSTOM_EMOJI_IDS["admin_panel"]}">🛡️</tg-emoji>',
-    "top_up": f'<tg-emoji emoji-id="{CUSTOM_EMOJI_IDS["top_up"]}">💰</tg-emoji>',
+    key: f'<tg-emoji emoji-id="{CUSTOM_EMOJI_IDS[key]}">😎</tg-emoji>' for key in CUSTOM_EMOJI_IDS
 }

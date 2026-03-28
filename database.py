@@ -7,6 +7,11 @@ from config import ADMIN_CHAT_ID
 DB_PATH = "bot.db"
 
 async def init_db():
+    cursor = await db.execute("PRAGMA table_info(pending_payments)")
+    columns = await cursor.fetchall()
+    if not any(col[1] == 'duration' for col in columns):
+        await db.execute("ALTER TABLE pending_payments ADD COLUMN duration TEXT")
+        await db.commit()
     async with aiosqlite.connect(DB_PATH) as db:
         # Таблица пользователей
         await db.execute("""
@@ -177,11 +182,11 @@ async def delete_expired_subscriptions() -> List[Tuple]:
         return expired
 
 # -------- Платежи --------
-async def add_pending_payment(user_id: int, chat_id: int, sub_type: str, data: str, amount: float, currency: str, provider: str, duration: str, payment_id: str = "") -> int:
+async def add_pending_payment(user_id: int, chat_id: int, sub_type: str, data: str, amount: float, currency: str, provider: str, payment_id: str = "", duration: str = "") -> int:
     async with aiosqlite.connect(DB_PATH) as db:
         cursor = await db.execute(
-            "INSERT INTO pending_payments (user_id, chat_id, type, data, amount, currency, provider, duration, payment_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-            (user_id, chat_id, sub_type, data, amount, currency, provider, duration, payment_id)
+            "INSERT INTO pending_payments (user_id, chat_id, type, data, amount, currency, provider, payment_id, duration) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            (user_id, chat_id, sub_type, data, amount, currency, provider, payment_id, duration)
         )
         await db.commit()
         return cursor.lastrowid

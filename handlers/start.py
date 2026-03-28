@@ -6,14 +6,13 @@ from aiogram.fsm.state import StatesGroup, State
 
 from database import add_user, log_action, is_admin
 from services.payment_providers import create_cryptobot_invoice, create_xrocket_invoice
-from config import PRICES, ALLOWED_CHAT_ID, CUSTOM_EMOJI_IDS, CUSTOM_EMOJIS
+from config import PRICES, ALLOWED_CHAT_ID, CUSTOM_EMOJI_IDS, CUSTOM_EMOJIS, SUBSCRIPTION_PRICES
 
 router = Router()
 
-class BuySubscription(StatesGroup):
-    choose_duration = State()
-    choose_duration_broadcast = State()
-    choose_duration_prefix = State()
+class SubscriptionStates(StatesGroup):
+    choosing_type = State()
+    choosing_duration = State()
     entering_text = State()
 
 @router.message(CommandStart())
@@ -22,6 +21,7 @@ async def cmd_start(message: Message, state: FSMContext):
     await log_action(message.from_user.id, "start", "запустил бота")
     await state.clear()
 
+    # Кнопки главного меню
     admin_btn = InlineKeyboardButton(
         text="Купить админку",
         callback_data="buy_admin",
@@ -71,18 +71,18 @@ async def buy_admin(callback: CallbackQuery, state: FSMContext):
 @router.callback_query(F.data == "buy_broadcast")
 async def buy_broadcast(callback: CallbackQuery, state: FSMContext):
     await callback.message.edit_text("Введите текст для рассылки (будет отправляться каждые 30 минут):")
-    await state.set_state(BuySubscription.entering_text)
+    await state.set_state(SubscriptionStates.entering_text)
     await state.update_data(sub_type="broadcast")
     await callback.answer()
 
 @router.callback_query(F.data == "buy_prefix")
 async def buy_prefix(callback: CallbackQuery, state: FSMContext):
     await callback.message.edit_text("Введите текст префикса (например, [VIP]):")
-    await state.set_state(BuySubscription.entering_text)
+    await state.set_state(SubscriptionStates.entering_text)
     await state.update_data(sub_type="prefix")
     await callback.answer()
 
-@router.message(BuySubscription.entering_text)
+@router.message(SubscriptionStates.entering_text)
 async def process_text(message: Message, state: FSMContext):
     text = message.text.strip()
     if not text:
@@ -91,69 +91,53 @@ async def process_text(message: Message, state: FSMContext):
     data = await state.get_data()
     sub_type = data["sub_type"]
     await state.update_data(data_text=text)
-    if sub_type == "broadcast":
-        await show_duration_options(message, "broadcast", state)
-    elif sub_type == "prefix":
-        await show_duration_options(message, "prefix", state)
-    else:
-        await state.clear()
-        await message.answer("Ошибка.")
+    await show_duration_options(message, sub_type, state)
 
 async def show_duration_options(message: Message, sub_type: str, state: FSMContext):
-    """Показывает варианты сроков для выбранного типа подписки."""
-    durations = {
-        "admin": [
-            {"key": "1_week", "label": "Неделя - 33$", "days": 7},
-            {"key": "2_weeks", "label": "2 недели - 40$", "days": 14},
-            {"key": "1_month", "label": "Месяц - 60$", "days": 30}
-        ],
-        "broadcast": [
-            {"key": "1_week", "label": "Неделя - 21$", "days": 7},
-            {"key": "2_weeks", "label": "2 недели - 30$", "days": 14},
-            {"key": "1_month", "label": "Месяц - 70$", "days": 30}
-        ],
-        "prefix": [
-            {"key": "1_month", "label": "Месяц - 25$", "days": 30},
-            {"key": "3_months", "label": "3 месяца - 70$", "days": 90},
-            {"key": "6_months", "label": "6 месяцев - 110$", "days": 180}
-        ]
-    }
+    prices = SUBSCRIPTION_PRICES[sub_type]
     buttons = []
-    for d in durations[sub_type]:
+    for duration, price in prices.items():
+        # Отображаемое название срока
+        display = duration.replace('_', ' ').capitalize()
+        if duration == "1_week":
+            display = "1 неделя"
+        elif duration == "2_weeks":
+            display = "2 недели"
+        elif duration == "1_month":
+            display = "1 месяц"
+        elif duration == "3_months":
+            display = "3 месяца"
+        elif duration == "6_months":
+            display = "6 месяцев"
         buttons.append([InlineKeyboardButton(
-            text=d["label"],
-            callback_data=f"duration_{sub_type}_{d['key']}_{d['days']}"
+            text=f"{display} – {price}$",
+            callback_data=f"duration_{sub_type}_{duration}"
         )])
     buttons.append([InlineKeyboardButton(text="◀ Назад", callback_data="back_to_start")])
-    keyboard = InlineKeyboardMarkup(inline_keyboard=buttons)
-    await message.answer("Выберите срок подписки:", reply_markup=keyboard)
+    await message.answer("Выберите срок подписки:", reply_markup=InlineKeyboardMarkup(inline_keyboard=buttons))
+    await state.set_state(SubscriptionStates.choosing_duration)
 
-@router.callback_query(F.data.startswith("duration_"))
-async def process_duration(callback: CallbackQuery, state: FSMContext):
-    parts = callback.data.split("_")
-    sub_type = parts[1]
-    duration_key = parts[2]
-    days = int(parts[3])
+@router.callback_query(SubscriptionStates.choosing_duration, F.data.startswith("duration_"))
+async def duration_selected(callback: CallbackQuery, state: FSMContext):
+    _, sub_type, duration = callback.data.split("_")
+    await state.update_data(duration=duration)
+    # Сохраняем срок и переходим к оплате
     data = await state.get_data()
+    sub_type = data["sub_type"]
     data_text = data.get("data_text", "")
-    amount = PRICES[sub_type][duration_key]
-
-    # Сохраняем duration в state
-    await state.update_data(duration=duration_key, days=days, amount=amount)
-
-    # Показываем способы оплаты
-    await show_payment_options(callback.message, sub_type, data_text, state, amount)
+    await show_payment_options(callback.message, sub_type, data_text, state, duration)
     await callback.answer()
 
-async def show_payment_options(message: Message, sub_type: str, data_text: str, state: FSMContext, amount: float):
+async def show_payment_options(message: Message, sub_type: str, data_text: str, state: FSMContext, duration: str):
+    price = SUBSCRIPTION_PRICES[sub_type][duration]
     cryptobot_btn = InlineKeyboardButton(
         text="CryptoBot",
-        callback_data=f"pay_cryptobot_{sub_type}_{data_text}",
+        callback_data=f"pay_cryptobot_{sub_type}_{duration}_{data_text}",
         icon_custom_emoji_id=CUSTOM_EMOJI_IDS["stats"]
     )
     xrocket_btn = InlineKeyboardButton(
         text="Xrocket",
-        callback_data=f"pay_xrocket_{sub_type}_{data_text}",
+        callback_data=f"pay_xrocket_{sub_type}_{duration}_{data_text}",
         icon_custom_emoji_id=CUSTOM_EMOJI_IDS["broadcast"]
     )
     back_btn = InlineKeyboardButton(
@@ -166,25 +150,18 @@ async def show_payment_options(message: Message, sub_type: str, data_text: str, 
         [xrocket_btn],
         [back_btn]
     ])
-    await message.answer(f"Выберите способ оплаты. Стоимость: {amount} USD.", reply_markup=keyboard)
+    await message.answer(f"Выберите способ оплаты. Стоимость: {price} USD.", reply_markup=keyboard)
 
 @router.callback_query(F.data.startswith("pay_"))
 async def process_payment(callback: CallbackQuery, state: FSMContext):
     data_parts = callback.data.split("_")
-    provider = data_parts[1]
+    provider = data_parts[1]          # cryptobot или xrocket
     sub_type = data_parts[2]
-    data_text = data_parts[3] if len(data_parts) > 3 else ""
+    duration = data_parts[3]
+    data_text = data_parts[4] if len(data_parts) > 4 else ""
     user_id = callback.from_user.id
 
-    # Получаем duration и сумму из state
-    state_data = await state.get_data()
-    duration = state_data.get("duration")
-    days = state_data.get("days")
-    amount = state_data.get("amount")
-    if not amount:
-        await callback.message.answer("Ошибка: не выбран срок.")
-        return
-
+    amount = SUBSCRIPTION_PRICES[sub_type][duration]
     currency = "USD"
 
     if provider == "cryptobot":
@@ -192,7 +169,7 @@ async def process_payment(callback: CallbackQuery, state: FSMContext):
         if invoice:
             from database import add_pending_payment
             payment_id = invoice["invoice_id"]
-            await add_pending_payment(user_id, ALLOWED_CHAT_ID, sub_type, data_text, amount, currency, provider, duration, payment_id)
+            await add_pending_payment(user_id, ALLOWED_CHAT_ID, sub_type, data_text, amount, currency, provider, payment_id, duration)
             await callback.message.answer(f"Оплатите по ссылке: {invoice['pay_url']}\nПосле оплаты подписка активируется автоматически.")
         else:
             await callback.message.answer("Ошибка создания счёта CryptoBot.")
@@ -201,12 +178,11 @@ async def process_payment(callback: CallbackQuery, state: FSMContext):
         if invoice:
             from database import add_pending_payment
             payment_id = invoice["id"]
-            await add_pending_payment(user_id, ALLOWED_CHAT_ID, sub_type, data_text, amount, currency, provider, duration, payment_id)
+            await add_pending_payment(user_id, ALLOWED_CHAT_ID, sub_type, data_text, amount, currency, provider, payment_id, duration)
             await callback.message.answer(f"Оплатите по ссылке: {invoice['pay_url']}\nПосле оплаты подписка активируется автоматически.")
         else:
             await callback.message.answer("Ошибка создания счёта Xrocket.")
     await callback.answer()
-    await state.clear()
 
 @router.callback_query(F.data == "back_to_start")
 async def back_to_start(callback: CallbackQuery, state: FSMContext):

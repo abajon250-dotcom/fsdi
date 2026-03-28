@@ -22,14 +22,14 @@ async def broadcast_job():
         if active_broadcast and user_text:
             text_to_send = user_text
     if text_to_send:
-        # Разбиваем текст на несколько сообщений по разделителю (можно изменить)
-        messages = text_to_send.split('\n---\n')
-        for msg in messages:
-            if msg.strip():
+        # Разделяем текст на части по разделителю \n---\n
+        parts = text_to_send.split("\n---\n")
+        for part in parts:
+            if part.strip():
                 try:
-                    await bot.send_message(ALLOWED_CHAT_ID, msg.strip(), parse_mode="HTML")
+                    await bot.send_message(ALLOWED_CHAT_ID, part, parse_mode="HTML")
                 except Exception as e:
-                    print(f"Ошибка рассылки: {e}")
+                    print(f"Ошибка при отправке части рассылки: {e}")
 
 async def check_expired_subscriptions():
     expired = await delete_expired_subscriptions()

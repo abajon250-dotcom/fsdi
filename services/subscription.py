@@ -1,27 +1,16 @@
 from datetime import datetime, timedelta
 from database import add_subscription, set_chat_broadcast, clear_chat_broadcast
-
-def parse_duration(duration_key: str) -> int:
-    """Возвращает количество дней для заданного ключа длительности."""
-    mapping = {
-        "1_week": 7,
-        "2_weeks": 14,
-        "1_month": 30,
-        "3_months": 90,
-        "6_months": 180
-    }
-    return mapping.get(duration_key, 7)
+from config import DURATIONS
 
 async def activate_subscription(user_id: int, chat_id: int, sub_type: str, data: str, duration_key: str):
-    """Активирует подписку на указанный срок."""
-    days = parse_duration(duration_key)
+    days = DURATIONS[sub_type][duration_key]
     expires_at = datetime.now() + timedelta(days=days)
     await add_subscription(user_id, chat_id, sub_type, data, expires_at)
 
     if sub_type == "admin":
         from main import bot
         try:
-            # Назначаем администратором без права назначать других админов
+            # Назначаем пользователя администратором без права назначать других
             await bot.promote_chat_member(
                 chat_id, user_id,
                 can_change_info=False,
@@ -36,13 +25,12 @@ async def activate_subscription(user_id: int, chat_id: int, sub_type: str, data:
     elif sub_type == "broadcast":
         await set_chat_broadcast(chat_id, data, user_id)
     elif sub_type == "prefix":
-        pass
+        pass   # префикс обрабатывается в групповых хендлерах
 
 async def revoke_subscription(user_id: int, chat_id: int, sub_type: str, data: str):
     if sub_type == "admin":
         from main import bot
         try:
-            # Снимаем права администратора
             await bot.promote_chat_member(
                 chat_id, user_id,
                 can_change_info=False,
