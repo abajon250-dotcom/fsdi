@@ -85,6 +85,7 @@ CUSTOM_EMOJI_IDS = {
 # HTML-теги для текстовых сообщений
 CUSTOM_EMOJIS = {
     key: f'<tg-emoji emoji-id="{CUSTOM_EMOJI_IDS[key]}">😎</tg-emoji>' for key in CUSTOM_EMOJI_IDS
+}
 import os
 from pathlib import Path
 from dotenv import load_dotenv
