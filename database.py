@@ -452,11 +452,11 @@ async def delete_expired_subscriptions() -> List[Tuple]:
         return expired
 
 # -------- Платежи --------
-async def add_pending_payment(user_id: int, chat_id: int, sub_type: str, data: str, amount: float, currency: str, provider: str, payment_id: str = "") -> int:
+async def add_pending_payment(user_id: int, chat_id: int, sub_type: str, data: str, amount: float, currency: str, provider: str, payment_id: str = "", duration: str = "") -> int:
     async with aiosqlite.connect(DB_PATH) as db:
         cursor = await db.execute(
-            "INSERT INTO pending_payments (user_id, chat_id, type, data, amount, currency, provider, payment_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-            (user_id, chat_id, sub_type, data, amount, currency, provider, payment_id)
+            "INSERT INTO pending_payments (user_id, chat_id, type, data, amount, currency, provider, payment_id, duration) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            (user_id, chat_id, sub_type, data, amount, currency, provider, payment_id, duration)
         )
         await db.commit()
         return cursor.lastrowid
