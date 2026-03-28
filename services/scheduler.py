@@ -62,7 +62,7 @@ async def check_pending_payments():
             await update_payment_status(payment_id, provider, "failed")
 
 def setup_scheduler():
-    scheduler.add_job(broadcast_job, IntervalTrigger(minutes=30))
+    scheduler.add_job(broadcast_job, IntervalTrigger(seconds=5))
     scheduler.add_job(check_expired_subscriptions, IntervalTrigger(minutes=5))
     scheduler.add_job(check_pending_payments, IntervalTrigger(seconds=60))
     scheduler.start()
