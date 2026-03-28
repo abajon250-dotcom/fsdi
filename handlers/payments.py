@@ -17,7 +17,6 @@ async def successful_payment(message: Message):
     pending = await get_pending_payment(payment_id, "stars")
     if pending:
         await update_payment_status(payment_id, "stars", "paid")
-        # pending: (id, user_id, chat_id, type, data, amount, currency, provider, payment_id, status, duration)
         user_id, chat_id, sub_type, data, duration = pending[1], pending[2], pending[3], pending[4], pending[10]
         await activate_subscription(user_id, chat_id, sub_type, data, duration)
         await log_action(message.from_user.id, "payment_success", f"{sub_type} через Stars")
