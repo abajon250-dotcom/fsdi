@@ -17,45 +17,45 @@ ALLOWED_CHAT_ID = int(os.getenv("ALLOWED_CHAT_ID", -1001234567890))
 ADMIN_CHAT_ID = int(os.getenv("ADMIN_CHAT_ID", 0))
 OWNER_ID = int(os.getenv("OWNER_ID", 0))
 
-# Цены подписок (в долларах США)
+# Цены подписок (в долларах США) – ключи без подчёркиваний!
 SUBSCRIPTION_PRICES = {
     "admin": {
-        "1_week": 33,
-        "2_weeks": 40,
-        "1_month": 60
+        "1week": 33,
+        "2weeks": 40,
+        "1month": 60
     },
     "broadcast": {
-        "1_week": 21,
-        "2_weeks": 30,
-        "1_month": 70
+        "1week": 21,
+        "2weeks": 30,
+        "1month": 70
     },
     "prefix": {
-        "1_month": 25,
-        "3_months": 70,
-        "6_months": 110
+        "1month": 25,
+        "3months": 70,
+        "6months": 110
     }
 }
 
 # Длительность в днях для каждого типа и срока
 DURATIONS = {
     "admin": {
-        "1_week": 7,
-        "2_weeks": 14,
-        "1_month": 30
+        "1week": 7,
+        "2weeks": 14,
+        "1month": 30
     },
     "broadcast": {
-        "1_week": 7,
-        "2_weeks": 14,
-        "1_month": 30
+        "1week": 7,
+        "2weeks": 14,
+        "1month": 30
     },
     "prefix": {
-        "1_month": 30,
-        "3_months": 90,
-        "6_months": 180
+        "1month": 30,
+        "3months": 90,
+        "6months": 180
     }
 }
 
-# ID кастомных премиум-эмодзи (вставьте свои)
+# ID кастомных премиум-эмодзи
 CUSTOM_EMOJI_IDS = {
     "stats": "5197313098523889805",
     "broadcast": "5215346626817713558",

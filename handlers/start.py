@@ -94,21 +94,23 @@ async def process_text(message: Message, state: FSMContext):
 async def show_duration_options(message: Message, sub_type: str, state: FSMContext):
     prices = SUBSCRIPTION_PRICES[sub_type]
     buttons = []
-    for duration, price in prices.items():
-        display = duration.replace('_', ' ').capitalize()
-        if duration == "1_week":
+    for duration_key, price in prices.items():
+        # Отображаемое название срока
+        if duration_key == "1week":
             display = "1 неделя"
-        elif duration == "2_weeks":
+        elif duration_key == "2weeks":
             display = "2 недели"
-        elif duration == "1_month":
+        elif duration_key == "1month":
             display = "1 месяц"
-        elif duration == "3_months":
+        elif duration_key == "3months":
             display = "3 месяца"
-        elif duration == "6_months":
+        elif duration_key == "6months":
             display = "6 месяцев"
+        else:
+            display = duration_key
         buttons.append([InlineKeyboardButton(
             text=f"{display} – {price}$",
-            callback_data=f"duration_{sub_type}_{duration}"
+            callback_data=f"duration_{sub_type}_{duration_key}"
         )])
     buttons.append([InlineKeyboardButton(text="◀ Назад", callback_data="back_to_start")])
     await message.answer("Выберите срок подписки:", reply_markup=InlineKeyboardMarkup(inline_keyboard=buttons))
@@ -116,7 +118,10 @@ async def show_duration_options(message: Message, sub_type: str, state: FSMConte
 
 @router.callback_query(SubscriptionStates.choosing_duration, F.data.startswith("duration_"))
 async def duration_selected(callback: CallbackQuery, state: FSMContext):
-    _, sub_type, duration = callback.data.split("_")
+    parts = callback.data.split("_")
+    # parts: ['duration', 'admin', '1week'] или ['duration', 'broadcast', '1month']
+    sub_type = parts[1]
+    duration = parts[2]
     await state.update_data(duration=duration)
     data = await state.get_data()
     sub_type = data["sub_type"]
