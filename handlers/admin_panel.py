@@ -82,7 +82,7 @@ async def admin_panel(message: Message):
         return
     await show_admin_panel(message)
 
-# ========================= СТАТИСТИКА =========================
+
 @router.callback_query(F.data == "admin_stats")
 async def show_stats(callback: CallbackQuery):
     if not await check_admin(callback.from_user.id):
@@ -291,7 +291,6 @@ async def back_to_admin(callback: CallbackQuery):
 @router.callback_query(F.data == "admin_close")
 async def close_admin(callback: CallbackQuery):
     await callback.message.delete()
-=======
 from aiogram import Router, F
 from aiogram.filters import Command
 from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
@@ -584,5 +583,4 @@ async def back_to_admin(callback: CallbackQuery):
 @router.callback_query(F.data == "admin_close")
 async def close_admin(callback: CallbackQuery):
     await callback.message.delete()
->>>>>>> 90814a586479640f3842d956d5a9cee7543dd098
     await callback.answer()

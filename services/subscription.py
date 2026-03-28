@@ -49,7 +49,6 @@ async def revoke_subscription(user_id: int, chat_id: int, sub_type: str, data: s
         if current_user == user_id:
             await clear_chat_broadcast(chat_id)
     elif sub_type == "prefix":
-=======
 from datetime import datetime, timedelta
 from database import add_subscription, set_chat_broadcast, clear_chat_broadcast
 
@@ -96,5 +95,4 @@ async def revoke_subscription(user_id: int, chat_id: int, sub_type: str, data: s
         if current_user == user_id:
             await clear_chat_broadcast(chat_id)
     elif sub_type == "prefix":
->>>>>>> 90814a586479640f3842d956d5a9cee7543dd098
         pass

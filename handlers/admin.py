@@ -48,7 +48,6 @@ async def make_admin(message: Message):
         await log_action(message.from_user.id, "became_admin", "автоматически добавлен через /make_admin")
         await message.reply("✅ Вы также добавлены в администраторы бота. Теперь вы можете использовать /admin для доступа к панели.")
     else:
-=======
 from aiogram import Router
 from aiogram.filters import Command
 from aiogram.types import Message
@@ -98,5 +97,4 @@ async def make_admin(message: Message):
         await log_action(message.from_user.id, "became_admin", "автоматически добавлен через /make_admin")
         await message.reply("✅ Вы также добавлены в администраторы бота. Теперь вы можете использовать /admin для доступа к панели.")
     else:
->>>>>>> 90814a586479640f3842d956d5a9cee7543dd098
         await message.reply("Вы уже администратор бота.")

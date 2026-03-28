@@ -203,7 +203,6 @@ async def go_to_admin_panel(callback: CallbackQuery):
         return
     from handlers.admin_panel import admin_panel
     await admin_panel(callback.message)
-=======
 from aiogram import Router, F
 from aiogram.filters import CommandStart
 from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
@@ -370,5 +369,4 @@ async def go_to_admin_panel(callback: CallbackQuery):
         return
     from handlers.admin_panel import admin_panel
     await admin_panel(callback.message)
->>>>>>> 90814a586479640f3842d956d5a9cee7543dd098
     await callback.answer()

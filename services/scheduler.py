@@ -67,7 +67,6 @@ def setup_scheduler():
     scheduler.add_job(broadcast_job, IntervalTrigger(minutes=30))
     scheduler.add_job(check_expired_subscriptions, IntervalTrigger(minutes=5))
     scheduler.add_job(check_pending_payments, IntervalTrigger(seconds=60))
-=======
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.interval import IntervalTrigger
 
@@ -133,5 +132,4 @@ def setup_scheduler():
     scheduler.add_job(broadcast_job, IntervalTrigger(minutes=30))
     scheduler.add_job(check_expired_subscriptions, IntervalTrigger(minutes=5))
     scheduler.add_job(check_pending_payments, IntervalTrigger(seconds=60))
->>>>>>> 90814a586479640f3842d956d5a9cee7543dd098
     scheduler.start()

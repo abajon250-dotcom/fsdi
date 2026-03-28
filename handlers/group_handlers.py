@@ -36,7 +36,6 @@ async def handle_prefix_and_emoji(message: Message):
         message.from_user.id,
         "prefix_emoji_used",
         f"префикс: {prefix_sub[4] if prefix_sub else ''} эмодзи: {emoji_sub[4] if emoji_sub else ''}"
-=======
 from aiogram import Router, F
 from aiogram.types import Message
 
@@ -74,5 +73,4 @@ async def handle_prefix_and_emoji(message: Message):
         message.from_user.id,
         "prefix_emoji_used",
         f"префикс: {prefix_sub[4] if prefix_sub else ''} эмодзи: {emoji_sub[4] if emoji_sub else ''}"
->>>>>>> 90814a586479640f3842d956d5a9cee7543dd098
     )

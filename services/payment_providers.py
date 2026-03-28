@@ -34,7 +34,6 @@ async def get_cryptobot_invoice_status(invoice_id: str):
                 result = await resp.json()
                 if result.get("ok") and result["result"]["items"]:
                     return result["result"]["items"][0]["status"]
-=======
 import aiohttp
 from config import CRYPTOBOT_TOKEN, CRYPTOBOT_API_URL, XROCKET_API_KEY
 
@@ -78,5 +77,4 @@ async def get_cryptobot_invoice_status(invoice_id: str):
                 result = await resp.json()
                 if result.get("ok") and result["result"]["items"]:
                     return result["result"]["items"][0]["status"]
->>>>>>> 90814a586479640f3842d956d5a9cee7543dd098
     return None

@@ -22,7 +22,6 @@ async def successful_payment(message: Message):
         await log_action(message.from_user.id, "payment_success", f"{pending[3]} через Stars")
         await message.answer("Подписка активирована! Спасибо за покупку.")
     else:
-=======
 from aiogram import Router, F
 from aiogram.types import PreCheckoutQuery, Message, SuccessfulPayment
 
@@ -46,5 +45,4 @@ async def successful_payment(message: Message):
         await log_action(message.from_user.id, "payment_success", f"{pending[3]} через Stars")
         await message.answer("Подписка активирована! Спасибо за покупку.")
     else:
->>>>>>> 90814a586479640f3842d956d5a9cee7543dd098
         await message.answer("Ошибка активации подписки.")

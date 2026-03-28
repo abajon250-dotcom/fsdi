@@ -281,7 +281,6 @@ async def get_stats() -> dict:
             "total_users": total_users,
             "active_subs": active_subs,
             "pending_payments": pending_payments
-=======
 import aiosqlite
 from datetime import datetime, timedelta
 from typing import Optional, List, Tuple
@@ -543,5 +542,4 @@ async def get_stats() -> dict:
             "total_users": total_users,
             "active_subs": active_subs,
             "pending_payments": pending_payments
->>>>>>> 90814a586479640f3842d956d5a9cee7543dd098
         }
