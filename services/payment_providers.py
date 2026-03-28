@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import aiohttp
 from config import CRYPTOBOT_TOKEN, CRYPTOBOT_API_URL, XROCKET_API_KEY
 

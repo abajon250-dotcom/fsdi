@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import aiosqlite
 from datetime import datetime, timedelta
 from typing import Optional, List, Tuple

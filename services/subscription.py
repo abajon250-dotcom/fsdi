@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 from datetime import datetime, timedelta
 from database import add_subscription, set_chat_broadcast, clear_chat_broadcast
 from config import DURATIONS
