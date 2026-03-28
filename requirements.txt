@@ -2,8 +2,4 @@ aiogram>=3.15.0
 apscheduler
 aiohttp
 aiosqlite
-<<<<<<< HEAD
 python-dotenv
-=======
-python-dotenv
->>>>>>> 90814a586479640f3842d956d5a9cee7543dd098
