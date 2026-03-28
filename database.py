@@ -280,6 +280,7 @@ async def get_stats() -> dict:
             "total_users": total_users,
             "active_subs": active_subs,
             "pending_payments": pending_payments
+        }
 import aiosqlite
 from datetime import datetime, timedelta
 from typing import Optional, List, Tuple
